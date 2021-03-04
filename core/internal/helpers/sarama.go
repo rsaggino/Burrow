@@ -132,15 +132,28 @@ func GetSaramaConfigFromClientProfile(profileName string) *sarama.Config {
 			saramaConfig.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 				return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
 			}
+			saramaConfig.Net.SASL.Handshake = viper.GetBool("sasl." + saslName + ".handshake-first")
+			saramaConfig.Net.SASL.User = viper.GetString("sasl." + saslName + ".username")
+			saramaConfig.Net.SASL.Password = viper.GetString("sasl." + saslName + ".password")
+
 		} else if mechanism == "SCRAM-SHA-512" {
 			saramaConfig.Net.SASL.Mechanism = sarama.SASLTypeSCRAMSHA512
 			saramaConfig.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 				return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
 			}
-		}
-		saramaConfig.Net.SASL.Handshake = viper.GetBool("sasl." + saslName + ".handshake-first")
-		saramaConfig.Net.SASL.User = viper.GetString("sasl." + saslName + ".username")
-		saramaConfig.Net.SASL.Password = viper.GetString("sasl." + saslName + ".password")
+			saramaConfig.Net.SASL.Handshake = viper.GetBool("sasl." + saslName + ".handshake-first")
+			saramaConfig.Net.SASL.User = viper.GetString("sasl." + saslName + ".username")
+			saramaConfig.Net.SASL.Password = viper.GetString("sasl." + saslName + ".password")
+		} else if mechanism == "GSSAPI" {
+			saramaConfig.Net.SASL.Enable = true
+			saramaConfig.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
+			saramaConfig.Net.SASL.GSSAPI.AuthType = sarama.KRB5_KEYTAB_AUTH
+			saramaConfig.Net.SASL.GSSAPI.ServiceName = viper.GetString("kerberos." + saslName + ".servicename")
+			saramaConfig.Net.SASL.GSSAPI.KerberosConfigPath = viper.GetString("kerberos." + saslName + ".krb5")
+			saramaConfig.Net.SASL.GSSAPI.Realm = viper.GetString("kerberos." + saslName + ".realm")
+			saramaConfig.Net.SASL.GSSAPI.KeyTabPath = viper.GetString("kerberos." + saslName + ".keytab")
+			saramaConfig.Net.SASL.GSSAPI.Username = viper.GetString("kerberos." + saslName + ".username")
+		}		
 	}
 
 	return saramaConfig
