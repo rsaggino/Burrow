@@ -153,6 +153,7 @@ func GetSaramaConfigFromClientProfile(profileName string) *sarama.Config {
 			saramaConfig.Net.SASL.GSSAPI.Realm = viper.GetString("sasl." + saslName + ".realm")
 			saramaConfig.Net.SASL.GSSAPI.KeyTabPath = viper.GetString("sasl." + saslName + ".keytab")
 			saramaConfig.Net.SASL.GSSAPI.Username = viper.GetString("sasl." + saslName + ".username")
+			saramaConfig.Net.SASL.GSSAPI.DisablePAFXFAST = true
 		}		
 	}
 
