@@ -132,15 +132,29 @@ func GetSaramaConfigFromClientProfile(profileName string) *sarama.Config {
 			saramaConfig.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 				return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
 			}
+			saramaConfig.Net.SASL.Handshake = viper.GetBool("sasl." + saslName + ".handshake-first")
+			saramaConfig.Net.SASL.User = viper.GetString("sasl." + saslName + ".username")
+			saramaConfig.Net.SASL.Password = viper.GetString("sasl." + saslName + ".password")
+
 		} else if mechanism == "SCRAM-SHA-512" {
 			saramaConfig.Net.SASL.Mechanism = sarama.SASLTypeSCRAMSHA512
 			saramaConfig.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 				return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
 			}
-		}
-		saramaConfig.Net.SASL.Handshake = viper.GetBool("sasl." + saslName + ".handshake-first")
-		saramaConfig.Net.SASL.User = viper.GetString("sasl." + saslName + ".username")
-		saramaConfig.Net.SASL.Password = viper.GetString("sasl." + saslName + ".password")
+			saramaConfig.Net.SASL.Handshake = viper.GetBool("sasl." + saslName + ".handshake-first")
+			saramaConfig.Net.SASL.User = viper.GetString("sasl." + saslName + ".username")
+			saramaConfig.Net.SASL.Password = viper.GetString("sasl." + saslName + ".password")
+		} else if mechanism == "GSSAPI" {
+			saramaConfig.Net.SASL.Enable = true
+			saramaConfig.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
+			saramaConfig.Net.SASL.GSSAPI.AuthType = sarama.KRB5_KEYTAB_AUTH
+			saramaConfig.Net.SASL.GSSAPI.ServiceName = viper.GetString("sasl." + saslName + ".servicename")
+			saramaConfig.Net.SASL.GSSAPI.KerberosConfigPath = viper.GetString("sasl." + saslName + ".krb5")
+			saramaConfig.Net.SASL.GSSAPI.Realm = viper.GetString("sasl." + saslName + ".realm")
+			saramaConfig.Net.SASL.GSSAPI.KeyTabPath = viper.GetString("sasl." + saslName + ".keytab")
+			saramaConfig.Net.SASL.GSSAPI.Username = viper.GetString("sasl." + saslName + ".username")
+			saramaConfig.Net.SASL.GSSAPI.DisablePAFXFAST = true
+		}		
 	}
 
 	return saramaConfig
